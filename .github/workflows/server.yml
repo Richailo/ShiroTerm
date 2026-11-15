@@ -1,0 +1,83 @@
+name: Sync server container
+on:
+  push:
+    branches: [main]
+    tags: ['server-v*']
+    paths:
+      - 'server/**'
+      - 'electron/sync.cjs'
+      - '.github/workflows/server.yml'
+  pull_request:
+    paths:
+      - 'server/**'
+      - 'electron/sync.cjs'
+      - '.github/workflows/server.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - run: npm test --prefix server
+  container:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/server-v') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - name: Validate container version
+        env:
+          RELEASE_REF: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          VERSION=$(node -p "require('./server/package.json').version")
+          if [ "$EVENT_NAME" != workflow_dispatch ] && [ "$RELEASE_REF" != "server-v$VERSION" ]; then exit 1; fi
+          echo "SERVER_VERSION=$VERSION" >> "$GITHUB_ENV"
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - name: Build test image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: server
+          load: true
+          tags: shiroterm-server:test
+          platforms: linux/amd64
+          cache-from: type=gha,scope=shiroterm-server
+          cache-to: type=gha,scope=shiroterm-server,mode=max
+      - name: Validate Compose and hardened container
+        run: |
+          cd server
+          node setup.cjs sync.example.test
+          docker compose config --quiet
+          cd ..
+          node server/tests/container-smoke.cjs
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish amd64 and arm64 images
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: server
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ghcr.io/richailo/shiroterm-server:${{ env.SERVER_VERSION }}
+            ghcr.io/richailo/shiroterm-server:latest
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=shiroterm-server
+          cache-to: type=gha,scope=shiroterm-server,mode=max

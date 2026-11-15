@@ -18,3 +18,14 @@ The independent profile-encryption passphrase is retained only in memory.
 
 Downloads are currently unsigned; compare the SHA-256 checksums and obtain
 packages only from this repository's Releases page.
+
+The optional server runs behind HTTPS and stores encrypted profile envelopes,
+salted password hashes and hashed session tokens in SQLite. Browser operations
+use HttpOnly/Secure/SameSite cookies, origin checks and CSRF tokens. Keep its
+data volume, secrets and backups private. Revoke all restored sessions after a
+backup restore. Server administrators should operate a single replica per database.
+
+Vaultwarden is an explicit optional trust boundary: the server can access login
+secrets while a user has unlocked their vault there. Unlock keys are held only
+in memory with a lifetime limit; encrypted CLI caches are separated by account.
+Do not enable this integration on an untrusted or shared server operator's host.

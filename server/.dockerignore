@@ -1,0 +1,11 @@
+*
+!Dockerfile
+!package.json
+!app.cjs
+!main.cjs
+!admin.cjs
+!LICENSE
+!lib/
+!lib/**
+!public/
+!public/**

@@ -84,9 +84,10 @@ no need to sign in on every launch. Expired or revoked device authorization
 requires a new browser sign-in.
 
 Local hosts are loaded before the server is contacted. An unavailable server
-never blocks the application. **No server is preconfigured**, and the desktop
-release does not include or host a synchronization server. Cloud-only Vaultwarden
-credentials require that server to be reachable.
+never blocks the application. **No server is preconfigured**. Deploy the included
+[ShiroTerm Server container](server/README.md) on your own infrastructure using
+Docker Compose with automatic HTTPS. Cloud-only Vaultwarden credentials require
+that server to be reachable.
 
 The independent passphrase used to decrypt synchronized profile backups is kept
 only in memory and must be entered again when unlocking those backups. It is
@@ -153,8 +154,9 @@ passwords or device tokens to decrypt there.
 This release supports the features listed above. Local shells, serial ports,
 embedded RDP, multiple jump-host hops, remote/dynamic port forwarding and saved
 workspace restoration are not implemented. SFTP directory deletion is limited
-to empty directories. The optional server is a separate project, not included
-in this repository. See [SECURITY.md](SECURITY.md) for security and privacy details.
+to empty directories. The optional server is included under [server/](server/README.md)
+and is deployed separately from the desktop app. See [SECURITY.md](SECURITY.md)
+for security and privacy details.
 
 ## Contributing
 

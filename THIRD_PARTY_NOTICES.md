@@ -12,3 +12,10 @@ Microsoft, the Linux Foundation, or the products identified by host icons.
 
 RDP clients (Windows Remote Desktop and Remmina) are separate system applications
 and are not bundled with ShiroTerm.
+
+The separate ShiroTerm Server container includes unmodified Bitwarden CLI
+2026.10.1. Its license and third-party notices are retained in the installed npm
+package under `/usr/local/lib/node_modules/@bitwarden/cli`. The upstream license
+information and corresponding source are available at
+https://github.com/bitwarden/clients/tree/cli-v2026.10.1. This component is a
+separate process; it is not included in the ShiroTerm desktop packages.
