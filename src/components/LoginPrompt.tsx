@@ -42,8 +42,6 @@ export default function LoginPrompt({host,username,reason,gatewayKey,hasSavedPas
       </div>
       <h2>Connect to {host.Name||host.Host}</h2>
       <p className="credential-host"><Server size={14}/> {host.Host}:{host.Port}</p>
-      <p>No working login method is available yet. Enter your account password
-        or select an SSH private key already authorized on the server.</p>
       {reason&&<div className="inline-error" role="alert">{reason}</div>}
       {error&&<div className="inline-error" role="alert">{error}</div>}
       <label className="field">Username
@@ -79,9 +77,6 @@ export default function LoginPrompt({host,username,reason,gatewayKey,hasSavedPas
         <input type="password" value={jumpPassphrase} autoComplete="off"
           onChange={e=>setJumpPassphrase(e.target.value)}/>
       </label>}
-      <p className="info-note">A new SSH key will not work until its public key is
-        authorized on the remote server. Passwords are saved only with your
-        consent; one-time passwords and key passphrases are not retained.</p>
       <div className="modal-actions">
         <button className="secondary-button" type="button" disabled={working} onClick={onCancel}>Cancel</button>
         <button className="primary-button" type="submit" disabled={working}>

@@ -44,7 +44,6 @@ export default function Logs(){
   };
   return <div className="feature-screen">
     <header className="feature-header"><div><h2>Connection activity</h2>
-      <p>Session status, errors and SSH identity prompts. Terminal content is never logged.</p>
     </div><div className="activity-actions">
       <button className="secondary-button" onClick={refresh}><RefreshCcw size={15}/> Refresh</button>
       <button className="secondary-button" disabled={!filtered.length} onClick={copy}>

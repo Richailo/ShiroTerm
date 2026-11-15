@@ -94,10 +94,15 @@ only in memory and must be entered again when unlocking those backups. It is
 separate from remembered account login. Host metadata and snapshots can sync;
 local encrypted passwords and private keys are not uploaded as part of profiles.
 
-HTTPS certificates are verified with the normal Node.js trust roots. For a
-private deployment, set `SHIROTERM_SYNC_CA` to the absolute path of a trusted
-CA PEM file before starting the application. Private addresses, trust roots,
-profile data and credentials are not bundled or published.
+HTTPS certificates are verified with public and operating-system trust roots.
+For a private or self-signed server, choose **Certyfikat HTTPS** in **Sync Server**,
+select its trusted public CA/certificate file (PEM, CRT, CER or DER), check the
+SHA-256 fingerprint and approve it. The certificate is saved for that exact server
+origin, including its port, and is reused after restart. Hostname and expiration
+checks remain enabled. Remove or replace the saved certificate when it changes.
+The legacy `SHIROTERM_SYNC_CA` environment option remains supported and adds to
+normal trust roots. Private server addresses, certificates, profile data and
+credentials are never bundled or published.
 
 ## Keyboard shortcuts
 

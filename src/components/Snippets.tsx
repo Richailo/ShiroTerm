@@ -29,7 +29,7 @@ export default function Snippets({items,onChange}:{
     setCopied(s.Id);
   };
   return <div className="feature-screen">
-    <header className="feature-header"><div><h2>Snippets</h2><p>Save and reuse frequently executed commands.</p></div>
+    <header className="feature-header"><div><h2>Snippets</h2></div>
       <button className="primary-button" onClick={add}><Plus size={17}/> New snippet</button>
     </header>
     <div className="feature-columns">

@@ -23,4 +23,5 @@ profiles-v*.json
 secrets-v*.json
 known-hosts-v*.json
 server-settings.json
+server-certificates.json
 server-device-session.bin

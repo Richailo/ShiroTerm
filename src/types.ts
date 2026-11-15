@@ -37,6 +37,7 @@ export interface Session {
   id:string;hostId:string;name:string;protocol:'SSH'|'SFTP'|'TELNET';status:string;
   error?:string;retryAttempt?:number;retryMax?:number;retryDelayMs?:number;
 }
+export interface ServerCertificate {subject:string;fingerprint:string;validTo:string}
 export interface ShiroBridge {
   profiles():Promise<Profiles>;
   syncLogin(input:{url:string;username:string;password:string;passphrase:string}):Promise<SyncStatus>;
@@ -46,6 +47,9 @@ export interface ShiroBridge {
   syncOpenConsole():Promise<void>;
   syncUnlockProfiles(passphrase:string):Promise<SyncStatus>;
   syncStatus():Promise<SyncStatus>;
+  syncCertificateInfo(input:{url:string}):Promise<ServerCertificate|null>;
+  syncCertificateImport(input:{url:string}):Promise<ServerCertificate|null>;
+  syncCertificateRemove(input:{url:string}):Promise<boolean>;
   syncReady():Promise<SyncStatus>;
   syncReconnect():Promise<SyncStatus>;
   onSyncRestored(callback:(status:SyncStatus)=>void):()=>void;

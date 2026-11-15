@@ -15,8 +15,7 @@ export default function KnownHosts(){
     catch(e){setError(String(e));}
   };
   return <div className="feature-screen">
-    <header className="feature-header"><div><h2>Known Hosts</h2>
-      <p>Trusted SSH host fingerprints saved in ShiroTerm Next.</p></div>
+    <header className="feature-header"><div><h2>Known Hosts</h2></div>
       <button className="secondary-button" onClick={reload}><RefreshCw size={16}/> Refresh</button>
     </header>
     {error&&<div className="inline-error">{error}</div>}

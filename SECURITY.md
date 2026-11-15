@@ -16,6 +16,12 @@ server address or private CA is bundled. A deployment may explicitly supply
 SHIROTERM_SYNC_CA pointing to its CA PEM file. Never disable TLS verification.
 The independent profile-encryption passphrase is retained only in memory.
 
+Private HTTPS certificates can be approved from the desktop's Sync Server page.
+Approval verifies the selected certificate against the server and requires a
+fingerprint confirmation. Saved trust applies only to the exact HTTPS origin;
+it never disables certificate-chain, hostname or validity checks. Public and OS
+trust roots remain available. Private keys are rejected by the certificate picker.
+
 Downloads are currently unsigned; compare the SHA-256 checksums and obtain
 packages only from this repository's Releases page.
 

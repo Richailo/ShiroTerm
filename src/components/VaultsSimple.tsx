@@ -93,14 +93,12 @@ export default function VaultsSimple({onDownload}:{onDownload:(themes?:TerminalT
   return <div className="feature-screen vaults-simple">
     <header className="feature-header"><div>
       <h2><FolderLock size={21}/> Vaults</h2>
-      <p>Twoje sejfy i bezpieczna synchronizacja profili.</p>
     </div></header>
     <div className="vaults-scroll">
       <div className="vaults-content">
         {!status?.connected?<div className="vaults-panel vaults-state">
           <LockKeyhole size={22}/>
-          <div><strong>Lokalne hosty są gotowe do pracy</strong>
-            <p>Synchronizacja jest opcjonalna. Aby z niej korzystać, otwórz Sync Server i zaloguj urządzenie raz. Kolejne połączenia będą automatyczne.</p></div>
+          <div><strong>Brak połączenia z serwerem</strong></div>
         </div>:<>
           <div className="vaults-panel">
             <div className="vaults-panel-heading">
@@ -159,8 +157,7 @@ export default function VaultsSimple({onDownload}:{onDownload:(themes?:TerminalT
             <summary>Zaawansowane: automatyczna synchronizacja i historia wersji</summary>
             <div className="vaults-advanced-body">
               <div className="vaults-setting-row">
-                <div><strong>Automatyczna synchronizacja</strong>
-                  <p>Włącz po pierwszym zapisaniu lub pobraniu profili.</p></div>
+                <div><strong>Automatyczna synchronizacja</strong></div>
                 <button className="secondary-button" disabled={busy||!status.encryptionReady||(!status.autoEnabled&&!status.autoReady)}
                   onClick={()=>void perform(()=>window.shiro.syncAutoSet(!status.autoEnabled),
                     status.autoEnabled?'Automatyczna synchronizacja wyłączona.':'Automatyczna synchronizacja włączona.')}>
@@ -168,8 +165,7 @@ export default function VaultsSimple({onDownload}:{onDownload:(themes?:TerminalT
                 </button>
               </div>
               <div className="vaults-setting-row">
-                <div><strong>Poprzednie wersje</strong>
-                  <p>Przywracanie wymaga potwierdzenia.</p></div>
+                <div><strong>Poprzednie wersje</strong></div>
                 <select aria-label="Wybierz poprzednią wersję" value={revision}
                   onChange={e=>setRevision(e.target.value)}>
                   <option value="">Wybierz wersję</option>

@@ -49,9 +49,6 @@ export default function SessionTools({open,tab,onTabChange,themeId,defaultId,hom
         onClick={()=>onTabChange('snippets')}><Code2 size={15}/> Snippets</button>
     </div>
     {tab==='appearance'?<div className="session-tools-body">
-      <p className="session-tools-hint">{home?
-        'This palette applies to Vaults, Hosts, Keychain and other main screens.':
-        'This palette belongs to the current host and is restored when its tab is active.'}</p>
       <ThemePicker embedded themeId={themeId} defaultId={defaultId}
         onSelect={onSelect} onMakeDefault={onMakeDefault} onClose={onClose}/>
     </div>:<div className="session-tools-body">
@@ -59,7 +56,6 @@ export default function SessionTools({open,tab,onTabChange,themeId,defaultId,hom
         <input aria-label="Find snippet" placeholder="Find a saved command…" value={query}
           onChange={e=>setQuery(e.target.value)}/></div>
       {error&&<div className="inline-error">{error}</div>}
-      {home?<p className="session-tools-hint">Open a terminal to insert or run snippets. You can manage snippets in the sidebar.</p>:null}
       <div className="session-snippets">
         {matches.map(s=><div className="session-snippet" key={s.Id}>
           <div className="session-snippet-content"><strong>{s.Name}</strong><code title={s.Command}>{s.Command}</code></div>

@@ -231,9 +231,7 @@ export default function Sftp({sessionId}:{sessionId:string}){
   ]);
   return <section className="commander-screen commander-v2">
     <div className="commander-header">
-      <div><h3><ArrowLeftRight size={18}/> SFTP Commander</h3>
-        <p>Browse local and remote files. Double-click to open, drag to transfer,
-          or right-click for actions. Drop files from your file manager onto Remote SFTP.</p></div>
+      <div><h3><ArrowLeftRight size={18}/> SFTP Commander</h3></div>
       <div className="commander-actions">
         <span className={'commander-connect '+(connected?'online':'offline')}>
           {connected?'● SFTP connected':'● SFTP unavailable'}</span>
@@ -359,7 +357,6 @@ export default function Sftp({sessionId}:{sessionId:string}){
         onClick={()=>void transfer('upload')}><Upload size={17}/> Copy to remote <span>→</span></button>
       <button className="secondary-button" disabled={busy||!connected||!chosen.remote.length}
         onClick={()=>void transfer('download')}><Download size={17}/> Copy to local <span>←</span></button>
-      <span className="commander-transfer-hint">Ctrl+click · Shift+click · Ctrl+A · drag &amp; drop</span>
       <button className="secondary-button" disabled={busy}
         onClick={()=>makeDialog(active,'mkdir')}><FolderPlus size={16}/> New folder</button>
     </div>

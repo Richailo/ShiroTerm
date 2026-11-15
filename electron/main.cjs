@@ -90,6 +90,32 @@ app.whenReady().then(()=>{
   ipcMain.handle('sync:open-console',()=>shell.openExternal(sync.consoleUrl()));
   ipcMain.handle('sync:unlock',(_event,passphrase)=>sync.unlockProfiles(passphrase));
   ipcMain.handle('sync:status',()=>sync.status());
+  ipcMain.handle('sync:certificate-info',(_event,input)=>sync.certificates.info(input?.url));
+  ipcMain.handle('sync:certificate-import',async(_event,input)=>{
+    if(sync.token||sync.pairing||sync.restoreBusy)throw Error('Najpierw zakończ aktywne połączenie z serwerem.');
+    const url=new URL(input?.url).origin;
+    // Validate the origin before opening a file picker or contacting the server.
+    sync.certificates.info(input?.url);
+    const picked=await dialog.showOpenDialog(win,{title:'Wybierz certyfikat HTTPS serwera',
+      properties:['openFile'],filters:[{name:'Certyfikaty',extensions:['pem','crt','cer','der']}]});
+    if(picked.canceled)return null;
+    const fs=require('node:fs'),file=picked.filePaths[0],stat=fs.statSync(file);
+    if(!stat.isFile()||stat.size>262144)throw Error('Nieprawidłowy plik certyfikatu.');
+    const data=fs.readFileSync(file);
+    const pems=await sync.certificates.verify(url,data);
+    const certificates=pems.map(pem=>new (require('node:crypto').X509Certificate)(pem));
+    const confirmed=await dialog.showMessageBox(win,{type:'question',
+      title:'Zaufaj certyfikatowi serwera?',message:url,
+      detail:certificates.map(cert=>cert.subject+'\nSHA-256: '+cert.fingerprint256+'\nWażny do: '+cert.validTo).join('\n\n'),
+      buttons:['Zaufaj','Anuluj'],defaultId:1,cancelId:1,noLink:true});
+    if(confirmed.response!==0)return null;
+    if(sync.token||sync.pairing||sync.restoreBusy)throw Error('Połączenie jest aktywne. Spróbuj ponownie później.');
+    return sync.certificates.set(url,data);
+  });
+  ipcMain.handle('sync:certificate-remove',(_event,input)=>{
+    if(sync.token||sync.pairing||sync.restoreBusy)throw Error('Najpierw zakończ aktywne połączenie z serwerem.');
+    return sync.certificates.remove(input?.url);
+  });
   ipcMain.handle('sync:reconnect',async()=>{
     await sync.restoreSession();
     return sync.status();

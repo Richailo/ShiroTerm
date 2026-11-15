@@ -112,7 +112,6 @@ export default function KeychainSimple({items,onChange}:{
   return <div className="feature-screen keychain-simple">
     <header className="feature-header">
       <div><h2><KeyRound size={20}/> Keychain</h2>
-        <p>Poświadczenia SSH — chronione przez system operacyjny lub powiązane z Vaultwarden.</p>
       </div>
       <button className="primary-button" onClick={create}><Plus size={16}/> Dodaj</button>
     </header>
@@ -192,7 +191,6 @@ export default function KeychainSimple({items,onChange}:{
         </div>:<div className="keychain-empty-center">
           <KeyRound size={28}/>
           <strong>Wybierz poświadczenie</strong>
-          <p>Lub utwórz nowe przyciskiem „Dodaj”.</p>
         </div>}
         {message&&<div className="save-success" role="status"><Check size={16}/>{message}</div>}
         {error&&<div className="inline-error" role="alert">{error}</div>}

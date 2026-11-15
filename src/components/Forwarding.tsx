@@ -35,8 +35,7 @@ export default function Forwarding({sessions}:{sessions:Session[]}){
     finally{setBusy(false);}
   };
   return <div className="feature-screen">
-    <header className="feature-header"><div><h2>Port Forwarding</h2>
-      <p>Local TCP forwarding through an established SSH session.</p></div>
+    <header className="feature-header"><div><h2>Port Forwarding</h2></div>
       <button className="secondary-button" onClick={refresh}><RefreshCw size={16}/> Refresh</button>
     </header>
     <div className="feature-editor">

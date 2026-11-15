@@ -1,7 +1,9 @@
 import {useEffect,useState} from 'react';
-import {Cloud,ExternalLink,LogIn,LogOut,ShieldCheck} from 'lucide-react';
-import type {SyncStatus} from '../types';
+import {Cloud,ExternalLink,LogIn,LogOut,ShieldCheck,X} from 'lucide-react';
+import type {SyncStatus,ServerCertificate} from '../types';
 type Pairing={code:string;expiresIn:number;portalUrl:string;browserOpened:boolean};
+const explain=(error:unknown)=>(error instanceof Error?error.message:String(error))
+  .replace(/^Error invoking remote method '[^']+':\s*(?:Error:\s*)?/,'');
 export default function ServerConnection(){
   const [url,setUrl]=useState('');
   const [status,setStatus]=useState<SyncStatus|null>(null);
@@ -9,11 +11,22 @@ export default function ServerConnection(){
   const [busy,setBusy]=useState(false);
   const [error,setError]=useState('');
   const [message,setMessage]=useState('');
+  const [certificate,setCertificate]=useState<ServerCertificate|null>(null);
+  useEffect(()=>{
+    let active=true;
+    const timer=window.setTimeout(()=>{
+      if(!url){setCertificate(null);return;}
+      void window.shiro.syncCertificateInfo({url}).then(value=>{
+        if(active)setCertificate(value);
+      }).catch(()=>{if(active)setCertificate(null);});
+    },150);
+    return ()=>{active=false;window.clearTimeout(timer);};
+  },[url]);
   useEffect(()=>{
     let alive=true;
     const refresh=()=>void window.shiro.syncStatus().then(s=>{
       if(alive){setStatus(s);if(s.url)setUrl(current=>current||s.url);if(s.connected)setPairing(null);}
-    }).catch(e=>{if(alive)setError(String(e));});
+    }).catch(e=>{if(alive)setError(explain(e));});
     refresh();
     const timer=window.setInterval(refresh,6000);
     return ()=>{alive=false;window.clearInterval(timer);};
@@ -41,7 +54,7 @@ export default function ServerConnection(){
       }catch(e){
         if(alive){
           // Network problems must not erase the active pairing code.
-          setError('Nie udało się sprawdzić parowania: '+(e instanceof Error?e.message:String(e)));
+          setError('Nie udało się sprawdzić parowania: '+explain(e));
         }
       }finally{working=false;}
     };
@@ -56,7 +69,7 @@ export default function ServerConnection(){
       setPairing(result);
       setMessage(result.browserOpened?'Zaloguj się w przeglądarce i zatwierdź kod.':
         'Otwórz panel WWW i zatwierdź poniższy kod.');
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
+    }catch(e){setError(explain(e));}
     finally{setBusy(false);}
   };
   const reconnect=async()=>{
@@ -66,7 +79,7 @@ export default function ServerConnection(){
       setStatus(next);
       if(next.connected)setMessage('Połączenie z zapamiętanym urządzeniem zostało przywrócone.');
       else setError('Nie można teraz połączyć się z serwerem. Zapamiętane logowanie zostało zachowane.');
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
+    }catch(e){setError(explain(e));}
     finally{setBusy(false);}
   };
   const cancel=async()=>{
@@ -74,7 +87,7 @@ export default function ServerConnection(){
     try{
       setStatus(await window.shiro.syncPairCancel());
       setPairing(null);setMessage('Parowanie anulowane. Możesz rozpocząć nowe.');
-    }catch(e){setError(e instanceof Error?e.message:String(e));}
+    }catch(e){setError(explain(e));}
     finally{setBusy(false);}
   };
   const logout=async()=>{
@@ -85,13 +98,27 @@ export default function ServerConnection(){
       setMessage('Wylogowano tę instalację.');
     }catch(e){
       setStatus(await window.shiro.syncStatus().catch(()=>null));
-      setError(e instanceof Error?e.message:String(e));
+      setError(explain(e));
     }finally{setBusy(false);}
+  };
+  const importCertificate=async()=>{
+    setBusy(true);setError('');setMessage('');
+    try{
+      const next=await window.shiro.syncCertificateImport({url});
+      if(next){setCertificate(next);setMessage('Certyfikat zapisany.');}
+    }catch(e){setError(explain(e));}
+    finally{setBusy(false);}
+  };
+  const removeCertificate=async()=>{
+    if(!confirm('Usunąć zapisany certyfikat tego serwera?'))return;
+    setBusy(true);setError('');setMessage('');
+    try{await window.shiro.syncCertificateRemove({url});setCertificate(null);}
+    catch(e){setError(explain(e));}
+    finally{setBusy(false);}
   };
   return <div className="feature-screen server-connection-screen">
     <header className="feature-header"><div>
       <h2><Cloud size={22}/> Sync Server</h2>
-      <p>Opcjonalna synchronizacja. Hosty i terminal działają również bez serwera.</p>
     </div></header>
     <div className="feature-editor server-connection-card">
       <div className="snippet-form server-connection-form">
@@ -100,15 +127,26 @@ export default function ServerConnection(){
             disabled={busy||!!status?.connected}
             onChange={e=>setUrl(e.target.value)}/>
         </label>
+        <div className="server-certificate-controls">
+          <button className="secondary-button" disabled={busy||!url.trim()||!!status?.connected||!!pairing||!!status?.pairingCode}
+            onClick={()=>void importCertificate()}><ShieldCheck size={16}/> Certyfikat HTTPS</button>
+          {certificate&&<>
+            <span className="server-certificate-name" title={certificate.subject+'\nSHA-256: '+certificate.fingerprint}>
+              {certificate.subject.replace(/^CN=/,'')}</span>
+            <button className="icon-button" aria-label="Usuń certyfikat HTTPS"
+              disabled={busy||!!status?.connected||!!pairing||!!status?.pairingCode}
+              onClick={()=>void removeCertificate()}><X size={16}/></button>
+          </>}
+        </div>
         {status?.connected?<>
           <div className="credential-info server-connected-status"><ShieldCheck size={19}/>
             <span>Połączono jako <strong>{status.user}</strong>
               {status.remembered&&<small className="remembered-session">
-                Urządzenie zapamiętane do {status.expiresAt?
+                Sesja do {status.expiresAt?
                   new Date(status.expiresAt*1000).toLocaleDateString('pl-PL'):'następnego wylogowania'}
               </small>}
               {!status.remembered&&<small className="remembered-session">
-                Nie można zapamiętać logowania. Odblokuj systemowy magazyn kluczy, a następnie połącz urządzenie ponownie.
+                Logowanie nie zostało zapamiętane.
               </small>}
             </span>
           </div>
@@ -121,7 +159,7 @@ export default function ServerConnection(){
         </>:<>
           {status?.reconnectAvailable&&<div className="credential-info server-remember-pending">
             <ShieldCheck size={18}/>
-            <span>Urządzenie jest zapamiętane. ShiroTerm automatycznie ponowi połączenie; lokalne hosty są dostępne przez cały czas.</span>
+            <span>Oczekiwanie na połączenie.</span>
             <button className="secondary-button" disabled={busy} onClick={()=>void reconnect()}>
               Połącz ponownie
             </button>
@@ -133,7 +171,6 @@ export default function ServerConnection(){
           {(pairing?.code||status?.pairingCode)&&<div className="credential-info server-pairing-card">
             <strong>Kod autoryzacji urządzenia</strong>
             <div className="server-pairing-code">{pairing?.code||status?.pairingCode}</div>
-            <p>Zatwierdź ten kod w panelu WWW. Połączenie zostanie nawiązane automatycznie.</p>
             <div className="snippet-actions server-connection-actions">
               <button className="secondary-button" onClick={()=>void window.shiro.syncOpenConsole()}>
                 <ExternalLink size={16}/> Otwórz panel WWW</button>
@@ -141,7 +178,6 @@ export default function ServerConnection(){
                 Anuluj parowanie</button>
             </div>
           </div>}
-          <p className="credential-info server-security-note">Zaloguj się raz w przeglądarce. ShiroTerm zapamięta urządzenie w systemowym magazynie i połączy się przy kolejnych uruchomieniach. Hasło szyfrowania kopii profili pozostaje oddzielne.</p>
         </>}
         {error&&<div className="inline-error" role="alert">{error}</div>}
         {message&&<div className="save-success" role="status">{message}</div>}

@@ -43,6 +43,9 @@ const {chromium}=require('playwright-core');
         window.__emitSSH=event=>{for(const callback of [...listeners])callback(event);};
         window.shiro={
           syncStatus:async()=>({connected:false,url:'',autoConflicts:[]}),
+          syncCertificateInfo:async()=>null,
+          syncCertificateImport:async()=>null,
+          syncCertificateRemove:async()=>true,
           syncReady:async()=>({connected:false,url:'',autoConflicts:[]}),
           syncAutoTick:async()=>({connected:false,autoConflicts:[]}),
           onSyncRestored:()=>()=>{},
@@ -354,7 +357,7 @@ const {chromium}=require('playwright-core');
       assert.equal(await page.locator('.inspector-content').count(),1,
         'Inspector contents should remain during closing animation');
       await page.locator('nav button.nav-link').filter({hasText:'Port Forwarding'}).click({timeout:3000});
-      try{await page.getByText('Local TCP forwarding through an established SSH session.').waitFor({timeout:5000});}
+      try{await page.getByRole('heading',{name:'Port Forwarding',exact:true}).waitFor({timeout:5000});}
       catch(e){console.log('UI_ERROR_STATE',JSON.stringify(errors),await page.locator('body').innerText().then(x=>x.slice(0,1400)));throw e;}
       await page.locator('nav button.nav-link').filter({hasText:'Keychain'}).click();
       await page.getByText('Network Operators').click();
@@ -687,7 +690,7 @@ const {chromium}=require('playwright-core');
       const rdpCard=page.locator('.host-card').filter({hasText:'Server 7'});
       const telnetCard=page.locator('.host-card').filter({hasText:'Server 8'});
       await rdpCard.getByRole('button',{name:'Edit Server 7'}).click();
-      await page.getByText('Windows Remote Desktop client (mstsc.exe)',{exact:false}).waitFor();
+      await page.getByText('Windows Remote Desktop / Remmina',{exact:true}).waitFor();
       assert.equal(await page.getByRole('button',{name:'Save & Open RDP'}).isEnabled(),true);
       const tabCountBeforeRdp=await page.locator('.title-tabs .title-tab').count();
       await page.getByRole('button',{name:'Save & Open RDP'}).click();

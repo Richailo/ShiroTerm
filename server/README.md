@@ -144,9 +144,9 @@ database; run one replica with its persistent volume. Do not share this SQLite
 database across multiple hosts or network filesystems.
 
 For private-LAN certificates, configure Caddy's `tls internal` or mount a trusted
-certificate/key. Install the corresponding CA in the desktop's trust setup, or
-point `SHIROTERM_SYNC_CA` at the CA PEM before starting ShiroTerm. Remove stale
-CA overrides when switching to a server with a public certificate. Never disable
+certificate/key. In the desktop, use **Sync Server → Certyfikat HTTPS** to import
+the trusted public CA/certificate, or install the CA in your operating system's
+trust store. The legacy `SHIROTERM_SYNC_CA` PEM option is also supported. Never disable
 certificate verification. Keep private keys and local configuration out of Git.
 
 ## Operations and backups

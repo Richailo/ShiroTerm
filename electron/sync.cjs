@@ -5,6 +5,7 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const {URL}=require('node:url');
 const {secureStorageAvailable}=require('./secure-storage.cjs');
+const {ServerCertificates,tlsMessage}=require('./sync-tls.cjs');
 function serverOrigin(value) {
   let url;
   try { url=new URL(String(value||'')); } catch { throw Error('Enter an HTTPS ShiroTerm Server address'); }
@@ -16,6 +17,7 @@ const {mergeProfiles,equal}=require('./sync-merge.cjs');
 class SyncClient {
   constructor(store) {
     this.store=store;
+    this.certificates=new ServerCertificates(store?.dir);
     this.settingsFile=store?.dir?path.join(store.dir,'server-settings.json'):null;
     this.endpoint='';
     try {
@@ -196,13 +198,12 @@ class SyncClient {
     const uri=new URL(resource,origin);
     if(uri.origin!==origin||uri.username||uri.password)
       throw Error('Sync requests must stay on the configured server');
-    // Custom trust roots are an explicit local deployment option, never bundled.
-    const ca=process.env.SHIROTERM_SYNC_CA?fs.readFileSync(process.env.SHIROTERM_SYNC_CA):undefined;
+    const secureOptions=this.certificates.options(origin);
     const body=payload===undefined?null:JSON.stringify(payload);
     if(body && Buffer.byteLength(body)>1900000)throw Error('Sync payload is too large');
     return new Promise((resolve,reject)=>{
       const req=https.request(uri,{
-        method,ca,rejectUnauthorized:true,timeout:12000,
+        method,...secureOptions,timeout:12000,
         headers:{'Accept':'application/json',
           ...(body?{'Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}:{}),
           ...(this.token?{'Authorization':'Bearer '+this.token}:{})}
@@ -218,7 +219,11 @@ class SyncClient {
         });
       });
       req.on('timeout',()=>req.destroy(Error('Sync server timed out')));
-      req.on('error',reject);
+      req.on('error',error=>{
+        const message=tlsMessage(error);
+        if(message===error.message){reject(error);return;}
+        reject(Object.assign(Error(message),{code:error.code}));
+      });
       if(body)req.write(body);
       req.end();
     });

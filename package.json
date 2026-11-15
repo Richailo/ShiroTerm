@@ -1,6 +1,6 @@
 {
   "name": "shiroterm-next",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Cross-platform SSH terminal and SFTP file manager for Windows and Linux",
   "main": "electron/main.cjs",
@@ -15,7 +15,8 @@
     "archive": "node tools/archive.cjs",
     "test:native": "node tests/electron-native-smoke.cjs",
     "test:packaged": "node tests/electron-native-smoke.cjs --packaged",
-    "test:ui": "node tests/ui-smoke.cjs"
+    "test:ui": "node tests/ui-smoke.cjs",
+    "test:sync-tls": "node tests/electron-sync-tls-smoke.cjs"
   },
   "dependencies": {
     "@xterm/addon-fit": "^0.11.0",

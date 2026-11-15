@@ -18,6 +18,9 @@ contextBridge.exposeInMainWorld('shiro',{
   syncOpenConsole:()=>invoke('sync:open-console'),
   syncUnlockProfiles:passphrase=>invoke('sync:unlock',passphrase),
   syncStatus:()=>invoke('sync:status'),
+  syncCertificateInfo:input=>invoke('sync:certificate-info',input),
+  syncCertificateImport:input=>invoke('sync:certificate-import',input),
+  syncCertificateRemove:input=>invoke('sync:certificate-remove',input),
   syncReady:()=>invoke('sync:ready'),
   syncReconnect:()=>invoke('sync:reconnect'),
   onSyncRestored:listener=>{

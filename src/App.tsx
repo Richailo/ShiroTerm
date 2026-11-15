@@ -149,24 +149,17 @@ function HostInspector({host,folders,credentials,hosts,onClose,onSaved,onConnect
             {PLATFORM_OPTIONS.map(([key,label])=><option value={key} key={key}>{label}</option>)}
           </select>
         </Field>
-        <p className="info-note">Detected: {platformName(draft.DetectedPlatform||'unknown')}
-          {draft.DetectedVersion?' · '+draft.DetectedVersion:''}.
-          {['SSH','SFTP'].includes(draft.Protocol)?
-            ' Automatic detection runs after SSH login.':' Detection is available for SSH hosts.'}
-          A manual override changes only the displayed identity and icon.</p>
+        {draft.DetectedPlatform&&<p className="info-note">Detected: {platformName(draft.DetectedPlatform)}
+          {draft.DetectedVersion?' · '+draft.DetectedVersion:''}</p>}
         <Field label="Label"><input value={draft.Name} onChange={e=>set('Name',e.target.value)} placeholder="Server name"/></Field>
         <Field label="Tags"><input value={draft.Tags} onChange={e=>set('Tags',e.target.value)} placeholder="production, web"/></Field>
         <label className="check-row"><input type="checkbox" checked={draft.Favorite}
           onChange={e=>set('Favorite',e.target.checked)}/> Add to favorites</label>
       </Section>
       {draft.Protocol==='RDP'?<Section title="Remote Desktop">
-        <p className="info-note">Opens the Windows Remote Desktop client (mstsc.exe)
-          or Remmina on Linux in a separate window. The client handles credentials and certificates.
-          ShiroTerm does not pass or store an RDP password.</p>
+        <p className="info-note">Windows Remote Desktop / Remmina</p>
       </Section>:draft.Protocol==='TELNET'?<Section title="Telnet · unencrypted">
-        <p className="info-note">Telnet traffic is unencrypted, including passwords.
-          The connection requires confirmation. Type credentials directly into the
-          terminal only on trusted networks. Nothing is automatically sent.</p>
+        <p className="info-note">Telnet traffic, including passwords, is not encrypted.</p>
       </Section>:<Section title="Credentials">
         <Field label="Keychain entry"><select value={draft.CredentialId}
           onChange={e=>set('CredentialId',e.target.value)}>
@@ -213,19 +206,12 @@ function HostInspector({host,folders,credentials,hosts,onClose,onSaved,onConnect
               onChange={e=>setJumpPassphrase(e.target.value)}
               placeholder="Leave blank if the gateway key is unencrypted"/>
           </Field>}
-        <p className="info-note">Traffic passes through the selected saved SSH host.
-          Each server's key is verified independently. One hop is supported.</p>
         </>}
         <Field label="Notes"><textarea value={draft.Notes} onChange={e=>set('Notes',e.target.value)} rows={4}/></Field>
         {['SSH','SFTP'].includes(draft.Protocol)&&<label className="check-row">
           <input type="checkbox" checked={draft.AutoReconnect}
           onChange={e=>set('AutoReconnect',e.target.checked)}/>
           Auto reconnect on unexpected disconnect</label>}
-        {draft.AutoReconnect&&['SSH','SFTP'].includes(draft.Protocol)&&
-          <p className="info-note">Up to 5 attempts (2–30 seconds).
-          Only previously established connections using saved credentials or an
-          unencrypted SSH key can reconnect automatically. Interactive passwords
-          and key passphrases are never retained.</p>}
       </Section>
       {!newRecord&&<button className="delete-host" onClick={remove}><Trash2 size={15}/> Delete host</button>}
     </div>
@@ -788,7 +774,6 @@ export default function App(){
               {booting?<div className="empty-panel">Loading profiles…</div>
               :filtered.length===0?<div className="empty-panel">
                 <Server size={35}/><h2>{profiles.Sessions.length?'No matching hosts':'Your hosts, organized'}</h2>
-                <p>{profiles.Sessions.length?'Try another search or group.':'Add a host to start connecting to your servers.'}</p>
                 <button className="primary-button" onClick={beginNew}><Plus size={16}/> Add host</button>
               </div>:<div className="host-grid">{filtered.map(host=><div
                 key={host.Id} className={'host-card '+(selectedHost?.Id===host.Id?'selected':'')}
@@ -836,7 +821,6 @@ export default function App(){
             <Logs/>
           </Suspense>:<div className="placeholder-page"><div className="placeholder-icon"><Settings2 size={27}/></div>
             <h2>{navigation.find(n=>n.id===section)?.label}</h2>
-            <p>This feature remains available in classic ShiroTerm while the new engine is being migrated.</p>
             <button className="secondary-button" onClick={()=>setSection('hosts')}><Server size={16}/> Back to Hosts</button>
           </div>}
           <aside className={'host-inspector '+(inspectorOpen&&section==='hosts'?'open':'')}

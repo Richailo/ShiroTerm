@@ -36,6 +36,12 @@ jobs:
       - name: Test packaged application on Linux
         if: runner.os == 'Linux'
         run: xvfb-run -a npm run test:packaged
+      - name: Test HTTPS certificate import on Windows
+        if: runner.os == 'Windows'
+        run: npm run test:sync-tls -- --packaged
+      - name: Test HTTPS certificate import on Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npm run test:sync-tls -- --packaged
       - run: npm run archive
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

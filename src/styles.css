@@ -1349,7 +1349,9 @@ button{background:none;border:0}button svg{flex-shrink:0}
   overflow-wrap:anywhere;font-variant-numeric:tabular-nums
 }
 .app .server-pairing-card p{margin:0 0 20px;line-height:1.7;color:var(--ui-muted)}
-.app .server-security-note{font-size:12px}
+.app .server-certificate-controls{display:flex;align-items:center;flex-wrap:wrap;gap:10px;min-width:0}
+.app .server-certificate-controls .secondary-button{flex-shrink:0}
+.app .server-certificate-name{color:var(--ui-muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 130px}
 .app .server-connection-form .inline-error,
 .app .server-connection-form .save-success{
   margin:0;padding:14px 17px;line-height:1.6;border-radius:10px

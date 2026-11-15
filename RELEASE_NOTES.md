@@ -1,5 +1,11 @@
-ShiroTerm for Windows and Linux: SSH terminal, SFTP file manager, jump hosts,
-local port forwarding, host groups, snippets, themes, external RDP and Telnet.
+ShiroTerm 0.2.1 fixes HTTPS trust for private synchronization servers and cleans
+up explanatory text across the desktop interface.
+
+- Uses public and operating-system certificate roots on Windows and Linux.
+- Adds a HTTPS certificate picker, fingerprint confirmation and saved trust scoped
+  to the exact server origin. Hostname and expiry checks remain enabled.
+- Removes redundant help paragraphs from Sync Server, Vaults, host settings,
+  authentication, themes, SFTP, Keychain and other main screens.
 
 - Works locally without an account or a synchronization server.
 - Optional ShiroTerm Server: sign in once in your browser; the OS-protected
