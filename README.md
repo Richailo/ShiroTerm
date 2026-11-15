@@ -8,6 +8,26 @@ React, TypeScript, xterm.js and ssh2. Free and open source under the MIT license
 ShiroTerm works without an account or a synchronization server. Your local hosts,
 credentials, snippets and SSH sessions are available immediately.
 
+## Screenshots
+
+The screenshots below use demonstration hosts, files and terminal output.
+
+**Host workspace**
+
+![ShiroTerm host workspace with saved Linux, Proxmox, TrueNAS and Windows hosts](docs/screenshots/hosts.png)
+
+**SSH terminal and snippets**
+
+![ShiroTerm SSH terminal with colored command output and the snippets sidebar](docs/screenshots/ssh-terminal.png)
+
+**SFTP file manager**
+
+![ShiroTerm SFTP Commander showing local and remote file panes](docs/screenshots/sftp.png)
+
+**Light theme and host settings**
+
+![ShiroTerm Alpine Paper light theme with the host settings panel](docs/screenshots/host-details-light.png)
+
 ## Download and run
 
 | System | Package | Start |
