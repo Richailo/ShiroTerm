@@ -29,6 +29,8 @@ const {createSftpFixture}=require('./helpers/sftp-fixture.cjs');
   const fixture=createSftpFixture();
   const clients=new Set();
   let authenticated=0,shellOpened=0;
+  let reportShellReady;
+  const shellReady=new Promise(resolve=>{reportShellReady=resolve;});
   const server=new Server({hostKeys:[privateKey]},client=>{
     clients.add(client);
     client.on('close',()=>clients.delete(client));
@@ -38,7 +40,7 @@ const {createSftpFixture}=require('./helpers/sftp-fixture.cjs');
         authenticated++;ctx.accept();
       }else ctx.reject();
     });
-    client.on('ready',()=>fixture.attach(client,()=>shellOpened++));
+    client.on('ready',()=>fixture.attach(client,()=>{shellOpened++;reportShellReady();}));
   });
   await new Promise((resolve,reject)=>{
     server.once('error',reject);
@@ -91,6 +93,14 @@ const {createSftpFixture}=require('./helpers/sftp-fixture.cjs');
       '.connection-state em')?.textContent?.trim()==='Connected',
       {timeout:20000});
     assert.equal(authenticated,1);
+    // SSH authentication can finish before the interactive shell opens.
+    // Wait for the fixture's actual shell handshake on both operating systems.
+    let shellDeadline;
+    try{
+      await Promise.race([shellReady,new Promise((_,reject)=>{
+        shellDeadline=setTimeout(()=>reject(Error('SSH shell did not open')),10000);
+      })]);
+    }finally{clearTimeout(shellDeadline);}
     assert.equal(shellOpened,1);
     assert.deepEqual(problems,[]);
     console.log('ELECTRON_NATIVE_SSH_PASS=true');
