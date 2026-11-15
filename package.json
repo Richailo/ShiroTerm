@@ -1,0 +1,56 @@
+{
+  "name": "shiroterm-next",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Cross-platform SSH terminal and SFTP file manager for Windows and Linux",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && electron . --dev\"",
+    "build": "tsc --noEmit && vite build",
+    "test": "node --test --test-concurrency=1 tests/*.test.cjs",
+    "package:win": "npm run build && node tools/package.cjs win32 x64",
+    "check": "npm run test && npm run build",
+    "package": "node tools/package.cjs",
+    "package:linux": "npm run build && node tools/package.cjs linux x64",
+    "archive": "node tools/archive.cjs",
+    "test:native": "node tests/electron-native-smoke.cjs",
+    "test:packaged": "node tests/electron-native-smoke.cjs --packaged",
+    "test:ui": "node tests/ui-smoke.cjs"
+  },
+  "dependencies": {
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "simple-icons": "^16.36.0",
+    "ssh2": "^1.17.0"
+  },
+  "devDependencies": {
+    "@electron/packager": "^18.3.6",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.2.0",
+    "electron": "^45.1.0",
+    "playwright-core": "^1.64.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.0",
+    "wait-on": "^8.0.0"
+  },
+  "productName": "ShiroTerm",
+  "license": "MIT",
+  "author": "Richailo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Richailo/ShiroTerm.git"
+  },
+  "homepage": "https://github.com/Richailo/ShiroTerm",
+  "bugs": {
+    "url": "https://github.com/Richailo/ShiroTerm/issues"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

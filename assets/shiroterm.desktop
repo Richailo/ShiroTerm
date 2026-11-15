@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ShiroTerm
+Comment=SSH terminal and SFTP file manager
+Exec=ShiroTerm
+Icon=shiroterm
+Terminal=false
+Categories=Network;RemoteAccess;
+StartupWMClass=shiroterm-next
